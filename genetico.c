@@ -35,7 +35,7 @@ A única informação armazenada sobre cada organismo é sua genética (ou seja,
 No caso aqui, 100 organismos, cada um com 20 genes. 
 Armazenando os genes de cada organismo como um array de variáveis ​​char.
 */
-void alocarMemoria(void){
+void alocarMemoria(void) {
 	int organismo;
 
 	geracaoAtual = (char**)malloc(sizeof(char*) * NUMERO_ORGANISMOS);
