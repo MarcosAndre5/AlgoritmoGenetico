@@ -30,12 +30,11 @@ int main(){
 	printf("A geração final foi: %d\n", geracaoFinal);
 }
 
-/*Primeira tarefa é alocar memória para armazenar os organismos. 
+/*	Primeira tarefa é alocar memória para armazenar os organismos. 
 A única informação armazenada sobre cada organismo é sua genética (ou seja, seu conjunto de genes).
 No caso aqui, 100 organismos, cada um com 20 genes. 
-Armazenando os genes de cada organismo como um array de variáveis ​​char.
-*/
-void alocarMemoria(void) {
+Armazenando os genes de cada organismo como um array de variáveis ​​char.	*/
+void alocarMemoria(void){
 	int organismo;
 
 	geracaoAtual = (char**)malloc(sizeof(char*) * NUMERO_ORGANISMOS);
@@ -49,9 +48,9 @@ void alocarMemoria(void) {
 	}
 }
 
-/*Primeiro é iniciados os organismos, então usamos um loop simples para ir de uma geração a outra até que uma 
+/*	Primeiro é iniciados os organismos, então usamos um loop simples para ir de uma geração a outra até que uma 
 geração perfeita seja encontrada. Uma geração perfeita é aquela que tem pelo menos um organismo que possui exatamente 
-os mesmos genes que o organismo modelo. Quando chegamos a uma geração perfeita, retornamos o número da geração.*/
+os mesmos genes que o organismo modelo. Quando chegamos a uma geração perfeita, retornamos o número da geração.	*/
 int fazerExecucao(void){
 	int geracoes = 1, geracaoPerfeita = FALSE;
 
@@ -67,8 +66,8 @@ int fazerExecucao(void){
 	}
 }
 
-/*Randomizamos os genes dos organismos.
-Cada gene pode ser um 0, 1, 2 e 3.*/
+/*	Randomizamos os genes dos organismos.
+Cada gene pode ser um 0, 1, 2 e 3.	*/
 void iniciarOrganismos(void){
 	int organismo, gene;
 
@@ -89,7 +88,10 @@ void iniciarOrganismos(void){
 	}
 }
 
-/**/
+/*	O estágio de avaliação tem dois propósitos. Primeiramente determinar a adequação de todos os organismos para
+que mais tarde, em produzirProximaGeracao(), saiba quais eram os melhores organismos e, portanto, quais deveriam se 
+reproduzir com mais frequência. E o objetivo secundário é decidir se existe uma geração perfeita, uma com pelo menos um 
+organismo que tenha a mesma genética do modelo.	*/
 int avaliarOrganismos(void){
 	int organismo, gene, organismoFitnessAtuais;
 
@@ -111,7 +113,10 @@ int avaliarOrganismos(void){
 	return FALSE;
 }
 
-/**/
+/*	Uma vez que é descoberto a adequação de todos os organismos em nossa geração atual, pode-se selecionar os melhores 
+organismos e reproduzi-los. Armazenando temporariamente cada organismo da nova geração, os filhos, na estrutura de dados 
+proximaGeracao. Depois de criarmos todos os filhos, copiá-los para a estrutura de dados Generation atual e a fase de 
+reprodução estará concluída.	*/
 void produzirProximaGeracao(void){
 	int organismo, gene, paiUm, paiDois, pontoDeCruzamento, mudarEsseGene;
 
