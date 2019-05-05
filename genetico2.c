@@ -61,9 +61,6 @@ int compara(const void *p1, const void *p2) {
 	return e2[numGenes] - e1[numGenes];
 }
 
-/*	Primeira tarefa é alocar memória para armazenar os organismos. A única informação armazenada sobre cada organismo
-é sua genética (ou seja, seu conjunto de genes). No caso aqui, 100 organismos, cada um com 20 genes. Armazenando os
-genes de cada organismo como um array de variáveis ​​char.	*/
 void alocarMemoria(void){
 	int organismo, i;
 
@@ -107,7 +104,6 @@ void alocarMemoria(void){
 	}
 }
 
-/*	Randomizamos os genes dos organismos. Cada gene pode ser um 0, 1, 2 e 3.	*/
 void iniciarOrganismos(void){
 	int organismo, gene;
 
@@ -123,10 +119,6 @@ void iniciarOrganismos(void){
 	qsort(geracaoAtual, NUMERO_ORGANISMOS, sizeof(int*), compara);
 }
 
-/*	Uma vez que é descoberto a adequação de todos os organismos em nossa geração atual, pode-se selecionar os
-melhores organismos e reproduzi-los. Armazenando temporariamente cada organismo da nova geração, os filhos, na
-estrutura de dados proximaGeracao. Depois de criarmos todos os filhos, copiá-los para a estrutura de dados
-Generation atual e a fase de reprodução estará concluída.	*/
 void produzirProximaGeracao(void){
 	int organismo, gene, paiUm, paiDois, pontoDeCruzamento;
 
@@ -157,13 +149,9 @@ void produzirProximaGeracao(void){
 		if(proximaGeracao[organismo][numGenes] > tamMochila)
 			proximaGeracao[organismo][numGenes + 1] = -1;
 	}
-
 	qsort(proximaGeracao, NUMERO_ORGANISMOS, sizeof(int*), compara);
 }
 
-/*	O método usado foi o Método da Roleta, que usaremos aqui. Cada organismo é "atribuído" a uma fatia da roleta.
-O tamanho da fatia que cada organismo recebe é proporcional à sua adequação. Então, após girarmos a roda e qualquer
-que seja a fatia em que pousamos, esse organismo é selecionado.	*/
 void selecionarOrganismo(void){
 	int i, j = 0, k;
 
@@ -188,11 +176,6 @@ void selecionarOrganismo(void){
     qsort(geracaoAtual, NUMERO_ORGANISMOS, sizeof(int*), compara);
 }
 
-
-/*	O estágio de avaliação tem dois propósitos. Primeiramente determinar a adequação de todos os organismos para
-que mais tarde, em produzirProximaGeracao(), saiba quais eram os melhores organismos e, portanto, quais deveriam se
-reproduzir com mais frequência. E o objetivo secundário é decidir se existe uma geração perfeita, uma com pelo menos
-um organismo que tenha a mesma genética do modelo.	*/
 int avaliarOrganismos(void){
 	int organismo, gene, organismoFitnessAtuais;
 
@@ -200,12 +183,6 @@ int avaliarOrganismos(void){
 	
 	for(organismo = 0; organismo < NUMERO_ORGANISMOS; organismo++){
 		organismoFitnessAtuais = 0;
-		for(gene = 0; gene < numGenes; gene++){
-			// if(geracaoAtual[organismo][gene] == organismoModelo[gene]){
-			// 	organismoFitnessAtuais++;
-			// }
-		}
-		//organismoFitnesses[organismo] = organismoFitnessAtuais;
 		totalFitnesses += organismoFitnessAtuais;
 		if(organismoFitnessAtuais == MAXIMO_FITNESS){
 			return TRUE;
@@ -214,9 +191,6 @@ int avaliarOrganismos(void){
 	return FALSE;
 }
 
-/*  Primeiro é iniciados os organismos, então usamos um loop simples para ir de uma geração a outra até que uma
-geração perfeita seja encontrada. Uma geração perfeita é aquela que tem pelo menos um organismo que possui exatamente
-os mesmos genes que o organismo modelo. Quando chegamos a uma geração perfeita, retornamos o número da geração. */
 int fazerExecucao(void){
     int geracoes = 1;
 
@@ -233,4 +207,3 @@ int fazerExecucao(void){
     }
     return geracoes;
 }
-
