@@ -9,6 +9,8 @@
 #define MAXIMO_FITNESS numGenes
 #define FALSE 0
 #define TRUE 1
+#define NUM_THREADS 2
+#define SUB_TAM (NUMERO_ORGANISMOS/NUM_THREADS)
 
 int **geracaoAtual, **proximaGeracao;
 int **organismoFitnesses;
@@ -20,7 +22,7 @@ void alocarMemoria(void);
 int fazerExecucao(void);
 void iniciarOrganismos(void);
 int avaliarOrganismos(void);
-void produzirProximaGeracao(void);
+void produzirProximaGeracao(int);
 void selecionarOrganismo(void);
 
 void imprimirAtual(int tam){
@@ -117,10 +119,10 @@ void iniciarOrganismos(void){
 	qsort(geracaoAtual, NUMERO_ORGANISMOS, sizeof(int*), compara);
 }
 
-void produzirProximaGeracao(void){
+void produzirProximaGeracao(int id){
 	int organismo, gene, paiUm, paiDois, pontoDeCruzamento;
 
-	for(organismo = 0; organismo < NUMERO_ORGANISMOS; organismo++){
+	for(organismo = id * SUB_TAM; organismo < (id + 1) * SUB_TAM; organismo++){
 		paiUm = rand() % NUMERO_ORGANISMOS;
 		do{
 			paiDois = rand() % NUMERO_ORGANISMOS;
@@ -188,25 +190,58 @@ int avaliarOrganismos(void){
 	return FALSE;
 }
 
+void *threadProduzirProximaGeracao(void *arg) {
+	int id = *(int *)arg;
+	printf("Thread %d INICIANDO\n", id);
+	produzirProximaGeracao(id);
+	printf("Thread %d SAINDO\n", id);
+	pthread_exit(NULL);
+}
+
 int fazerExecucao(void){
 	int geracoes = 1;
+	int ids[NUM_THREADS];
+	pthread_t thread[NUM_THREADS];
+	pthread_attr_t attr;
+	int i, rc;
+
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
 	iniciarOrganismos();
 	imprimirAtual(NUMERO_ORGANISMOS);
 	while(geracoes < MAX_GERACOES){
-		produzirProximaGeracao();
+
+		for(i = 0; i < NUM_THREADS; i++) {
+			ids[i] = i;
+			rc = pthread_create(&thread[i], &attr, threadProduzirProximaGeracao, (void *)&ids[i]);  
+	    	if (rc) {
+	    		printf("ERROR; return code from pthread_create() is %d\n", rc);
+	    		exit(-1);
+	    	}
+	    }
+
+		for(i = 0; i < NUM_THREADS; i++) {
+		    rc = pthread_join(thread[i], NULL);
+		    if (rc) {
+			    printf("ERROR; return code from pthread_join() is %d\n", rc);
+			    exit(-1);
+		    }
+		}
+
 		selecionarOrganismo();
 		printf("\t================== GERACAO %d ==================\n", geracoes);
 		imprimirAtual(1);
 		imprimirProx(0);
 		geracoes++;
 	}
+	pthread_attr_destroy(&attr);
 	return geracoes;
 }
 
 void *thread(void *arg){
 	printf("Thread criada com sucesso!\n");
-	alocarMemoria();
+	
 	pthread_exit(NULL);
 }
 
@@ -215,20 +250,10 @@ int main(int argc, char *argv[]){
 	int status_thread;
 	void * thread_res;
 
-	printf("Iniciando criacao da Thread!\n");
-	status_thread = pthread_create(&thread_id, NULL, thread, NULL);
-	if(status_thread != 0){
-		printf("Erro na Criacao da Thread!");
-		exit(-1);
-	}
-	status_thread = pthread_join(thread_id, &thread_res);
-	if(status_thread != 0){
-		printf("Erro no Retorno da Thread!");
-		exit(-1);
-	}
-	//pthread_exit(NULL);
-
 	srand(time(0));
+	alocarMemoria();
 	fazerExecucao();
 	return 0;
 }
+
+// inf = id * sub_tam	sup = (id + 1) * sub_tam
