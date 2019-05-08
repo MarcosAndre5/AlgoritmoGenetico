@@ -14,9 +14,7 @@ int **geracaoAtual, **proximaGeracao;
 int **organismoFitnesses;
 int **organismoFitnessesProx;
 int **itens;
-int totalFitnesses;
-int numGenes;
-int tamMochila;
+int totalFitnesses, numGenes, tamMochila;
 
 void alocarMemoria(void);
 int fazerExecucao(void);
@@ -63,7 +61,7 @@ int compara(const void *p1, const void *p2){
 
 void alocarMemoria(void){
 	int organismo, i;
-
+	printf("Alocacao!");
 	scanf("%d %d", &numGenes, &tamMochila);
 
 	geracaoAtual = (int**)malloc(sizeof(int*) * NUMERO_ORGANISMOS);
@@ -109,8 +107,9 @@ void iniciarOrganismos(void){
 	for(organismo = 0; organismo < NUMERO_ORGANISMOS; organismo++){
 		for(gene = 0; gene < numGenes; gene++){
 			geracaoAtual[organismo][gene] = rand() % 2;
-			if(geracaoAtual[organismo][numGenes] + itens[gene][0] > tamMochila)
+			if(geracaoAtual[organismo][numGenes] + itens[gene][0] > tamMochila){
 				geracaoAtual[organismo][gene] = 0;
+			}
 			geracaoAtual[organismo][numGenes] += geracaoAtual[organismo][gene] * itens[gene][0];
 			geracaoAtual[organismo][numGenes + 1] += geracaoAtual[organismo][gene] * itens[gene][1];
 		}
@@ -139,13 +138,14 @@ void produzirProximaGeracao(void){
 			proximaGeracao[organismo][numGenes + 1] += proximaGeracao[organismo][gene] * itens[gene][1];
 		}
 		gene = rand() % numGenes;
-		if((rand() % (int)(1.0 / TAXA_MUTACAO)) == 0) {
+		if((rand() % (int)(1.0 / TAXA_MUTACAO)) == 0){
 			proximaGeracao[organismo][gene] = proximaGeracao[organismo][gene] ? 0: 1;
 			proximaGeracao[organismo][numGenes] += proximaGeracao[organismo][gene] * itens[gene][0];
 			proximaGeracao[organismo][numGenes + 1] += proximaGeracao[organismo][gene] * itens[gene][1];
 		}
-		if(proximaGeracao[organismo][numGenes] > tamMochila)
+		if(proximaGeracao[organismo][numGenes] > tamMochila){
 			proximaGeracao[organismo][numGenes + 1] = -1;
+		}
 	}
 	qsort(proximaGeracao, NUMERO_ORGANISMOS, sizeof(int*), compara);
 }
@@ -158,8 +158,7 @@ void selecionarOrganismo(void){
 			int *tmp = geracaoAtual[i];
 			int ok = 1;
 			for(k = 0; k < NUMERO_ORGANISMOS; k++){
-				if(geracaoAtual[k][numGenes + 1] == proximaGeracao[j][numGenes + 1]
-					&& geracaoAtual[k][numGenes] == proximaGeracao[j][numGenes]){
+				if(geracaoAtual[k][numGenes + 1] == proximaGeracao[j][numGenes + 1] && geracaoAtual[k][numGenes] == proximaGeracao[j][numGenes]){
 					ok = 0;
 					break;
 				}
@@ -207,6 +206,7 @@ int fazerExecucao(void){
 
 void *thread(void *arg){
 	printf("Thread criada com sucesso!\n");
+	alocarMemoria();
 	pthread_exit(NULL);
 }
 
@@ -226,10 +226,9 @@ int main(int argc, char *argv[]){
 		printf("Erro no Retorno da Thread!");
 		exit(-1);
 	}
-	pthread_exit(NULL);
+	//pthread_exit(NULL);
 
 	srand(time(0));
-	//alocarMemoria();
-	//fazerExecucao();
+	fazerExecucao();
 	return 0;
 }
